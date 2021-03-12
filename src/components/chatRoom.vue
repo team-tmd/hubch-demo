@@ -1,0 +1,117 @@
+<template>
+  <div>
+    {{ $route.params.id }}
+    <section v-for="message in messages" :key="message.id" class="item">
+      <!-- <section v-for="(room) in messages" :key="message.id" class="item"> -->
+      <div class="item-message">{{ message.text }}</div>
+    </section>
+    <div class="form">
+      <!-- New Room作成部分 -->
+      <form action="" @submit.prevent="sendMessage">
+        <textarea
+          v-model="message_input"
+          @keydown.enter.exact.prevent="sendMessage"
+        ></textarea>
+        <button type="submit">Send message</button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+// firebase モジュール
+import firebase from "firebase"
+
+export default {
+  data() {
+    return {
+      user: "",
+      message_input: "",
+      messages: [],
+      users: [],
+    }
+  },
+
+  created() {
+    ///Roomリストの表示
+    const col_rooms = firebase
+      .firestore()
+      .collection("messages")
+      .orderBy("timestamp")
+      .limit(15)
+    col_rooms.get().then((snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        this.messages.push({
+          id: doc.id,
+          ...doc.data(),
+        })
+      })
+    })
+  },
+
+  methods: {
+    sendMessage() {
+      if (this.message_input.length) {
+        const quary = firebase.firestore().collection("messages")
+        const newMessage = {
+          text: this.message_input,
+          //owner:
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+        quary
+          .add(newMessage)
+          .catch(function(error) {
+            console.error("Error writing new message to database", error)
+          })
+          .then((ref) => {
+            this.messages.push({
+              id: ref.id,
+              ...newMessage,
+            })
+          })
+          .then(() => {
+            this.message_input = ""
+          })
+      }
+    },
+  },
+}
+</script>
+
+<style>
+.room-lists {
+  width: 50%;
+  position: relative;
+  /* display: inline-block; */
+  display: flex;
+  padding: 2em;
+  background: #00ff95;
+  border: 1px solid black;
+  border-radius: 4px;
+  line-height: 1.2em;
+}
+.item {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 0.8em;
+}
+.item-message {
+  position: relative;
+  display: inline-block;
+  padding: 0.8em;
+  background: #deefe8;
+  border-radius: 4px;
+  line-height: 1.2em;
+}
+.form {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  bottom: 0;
+  height: 80px;
+  width: 100%;
+  background: #f5f5f5;
+}
+</style>

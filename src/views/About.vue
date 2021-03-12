@@ -1,5 +1,17 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <chatRoom />
+    <router-view />
   </div>
 </template>
+
+<script>
+// @ is an alias to /src
+import chatRoom from "@/components/chatRoom.vue"
+
+export default {
+  components: {
+    chatRoom,
+  },
+}
+</script>
