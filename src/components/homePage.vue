@@ -9,8 +9,8 @@
       <button type="submit">Create New Room</button>
     </form>
     <div>
-      <div v-for="room in rooms" :key="room.id" class="room-lists">
-        <a @click="toChatRoom(room.id)">{{ room.title }}</a>
+      <div v-for="room in rooms" :key="room.id">
+        <a @click="toChatRoom(room.id)" class="room-lists">{{ room.title }}</a>
       </div>
     </div>
   </div>

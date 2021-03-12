@@ -36,6 +36,8 @@ export default {
     ///Roomリストの表示
     const col_rooms = firebase
       .firestore()
+      .collection("rooms")
+      .doc(this.$route.params.id)
       .collection("messages")
       .orderBy("timestamp")
       .limit(15)
@@ -52,7 +54,11 @@ export default {
   methods: {
     sendMessage() {
       if (this.message_input.length) {
-        const quary = firebase.firestore().collection("messages")
+        const quary = firebase
+          .firestore()
+          .collection("rooms")
+          .doc(this.$route.params.id)
+          .collection("messages")
         const newMessage = {
           text: this.message_input,
           //owner:
