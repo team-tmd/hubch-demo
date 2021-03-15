@@ -9,11 +9,14 @@
       <!-- New Room作成部分 -->
       <form action="" @submit.prevent="sendMessage">
         <textarea
-          v-model="message_input"
+          v-model="inputMessage"
           @keydown.enter.exact.prevent="sendMessage"
         ></textarea>
         <button type="submit">Send message</button>
       </form>
+
+      <input type="file" accept="image/*" @change="sendImage" />
+      <img :src="message.imageURL" alt="" id="messageImg" />
     </div>
   </div>
 </template>
@@ -26,9 +29,11 @@ export default {
   data() {
     return {
       user: "",
-      message_input: "",
+      inputMessage: "",
+      inputImage: "",
       messages: [],
       users: [],
+      imageURL: "",
     }
   },
 
@@ -53,17 +58,19 @@ export default {
 
   methods: {
     sendMessage() {
-      if (this.message_input.length) {
+      if (this.inputMessage.length) {
         const quary = firebase
           .firestore()
           .collection("rooms")
           .doc(this.$route.params.id)
           .collection("messages")
+
         const newMessage = {
-          text: this.message_input,
+          text: this.inputMessage,
           //owner:
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         }
+
         quary
           .add(newMessage)
           .catch(function(error) {
@@ -76,9 +83,52 @@ export default {
             })
           })
           .then(() => {
-            this.message_input = ""
+            this.inputMessage = ""
           })
       }
+    },
+
+    sendImage(file) {
+      const quary = firebase
+        .firestore()
+        .collection("rooms")
+        .doc(this.$route.params.id)
+        .collection("messages")
+      quary
+        .add({
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(function(messageRef) {
+          const filePath =
+            firebase.auth().currentUser.uid +
+            "/" +
+            messageRef.id +
+            "/" +
+            file.name
+
+          return firebase
+            .storage()
+            .ref(filePath)
+            .put(file)
+            .then(function(fileSnapshot) {
+              //return fileSnapshote.ref.getDownloadURL().then((url) => {
+              fileSnapshot.ref.getDownloadURL().then((url) => {
+                //return messageRef.update({
+                messageRef.update({
+                  imageURL: url,
+                  //text: url,
+                  storageUrl: fileSnapshot.metadata.fullPath,
+                  //text: fileSnapshote.metadata.fullPath,
+                })
+              })
+            })
+        })
+        .catch(function(error) {
+          console.error(
+            "There was an error uploading a file to Cloud Strage",
+            error
+          )
+        })
     },
   },
 }

@@ -96,4 +96,8 @@ export default {
   border-radius: 4px;
   line-height: 1.2em;
 }
+
+.room-lists:hover {
+  background-color: #007c48;
+}
 </style>
