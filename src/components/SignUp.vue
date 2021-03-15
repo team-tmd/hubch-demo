@@ -2,7 +2,7 @@
   <div>
     <div>
       <div v-if="user.uid" key="sign-in">
-        [{{ (user.profile, user.displayName) }}]
+        [{{ user.displayName }}]
         <button type="button" @click="signOut">Sign out</button>
       </div>
       <div v-else key="sign-out">
@@ -17,7 +17,7 @@ import firebase from "firebase"
 export default {
   data() {
     return {
-      user: "",
+      user: {},
     }
   },
 
@@ -34,11 +34,7 @@ export default {
     //Sign in
     signIn() {
       let provider = new firebase.auth.GoogleAuthProvider()
-      firebase
-        .auth()
-        .signInWithPopup(provider)
-        // .then(this.users getProffilePicUrl)
-        .then(this.getUsersName)
+      firebase.auth().signInWithPopup(provider)
     },
     //Sign out
     signOut() {

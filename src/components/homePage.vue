@@ -9,8 +9,8 @@
       <button type="submit">Create New Room</button>
     </form>
     <div>
-      <div v-for="room in rooms" :key="room.id" class="room-lists">
-        <a @click="toChatRoom(room.id)">{{ room.title }}</a>
+      <div v-for="room in rooms" :key="room.id">
+        <a @click="toChatRoom(room.id)" class="room-lists">{{ room.title }}</a>
       </div>
     </div>
   </div>
@@ -95,5 +95,9 @@ export default {
   border: 1px solid black;
   border-radius: 4px;
   line-height: 1.2em;
+}
+
+.room-lists:hover {
+  background-color: #007c48;
 }
 </style>
